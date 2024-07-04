@@ -47,6 +47,6 @@ public class Payment {
     @Column(nullable = false, length = 2)
     private int totalCardInstallment;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     private Card card;
 }

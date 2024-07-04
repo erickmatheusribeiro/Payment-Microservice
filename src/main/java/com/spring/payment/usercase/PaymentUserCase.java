@@ -1,15 +1,17 @@
 package com.spring.payment.usercase;
 
+import com.spring.payment.entities.Card;
 import com.spring.payment.entities.Payment;
 import com.spring.payment.interfaceadapters.gateways.CardGateway;
 import com.spring.payment.interfaceadapters.gateways.PaymentGateway;
 import com.spring.payment.interfaceadapters.presenters.converters.CardPresenter;
-import com.spring.payment.interfaceadapters.presenters.dto.CardDto;
 import com.spring.payment.interfaceadapters.presenters.dto.PaymentDto;
 import com.spring.payment.util.enums.PaymentStatus;
+import com.spring.payment.util.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -28,26 +30,38 @@ public class PaymentUserCase {
     @Autowired
     private PaymentGateway paymentGateway;
 
-    public Payment createPayment(PaymentDto dto){
+    public Payment createPayment(PaymentDto dto) throws BusinessException{
         Payment entity = new Payment();
-        CardDto cardDto = new CardDto();
+
+        if(dto.getValue().compareTo(BigDecimal.ZERO) <= 0){
+            throw new BusinessException("PAYMENT_VALUE_INVALID");
+        }
+        if(dto.getTotalCardInstallment() <= 0){
+            throw new BusinessException("PAYMENT_TOTAL_CARD_INSTALLMENT_INVALID");
+        }
+
+        Card cardEntity = new Card();
 
         entity.setStatus(PaymentStatus.PENDING);
         entity.setUsers(dto.getUser());
         entity.setOrders(dto.getOrder());
         entity.setDateTimeCreated(LocalDateTime.now(clock));
+        entity.setTotalCardInstallment(dto.getTotalCardInstallment());
+        entity.setValue(dto.getValue());
 
-        cardDto = cardPresenter.mapToDto(cardGateway.findByCardNumber(dto.getCard().getCardNumber()));
 
-        if( cardDto == null){
+        if( cardGateway.findByCardNumber(dto.getCard().getCardNumber()) == null){
 
-            cardDto.setUsers(dto.getUser());
-            cardDto.setStatus(true);
+            cardEntity.setUsers(dto.getUser());
+            cardEntity.setCardNumber(dto.getCard().getCardNumber());
+            cardEntity.setName(dto.getCard().getName());
+            cardEntity.setExpirationDate(dto.getCard().getExpirationDate());
+            cardEntity.setCvv(dto.getCard().getCvv());
+            cardEntity.setStatus(true);
+            cardEntity.setDateTimeCreated(LocalDateTime.now(clock));
 
             entity.setCard(
-                    cardGateway.insert(
-                            cardPresenter.mapToEntity(cardDto)
-                    )
+                    cardGateway.insert(cardEntity)
             );
         } else {
             entity.setCard(cardGateway.findByCardNumber(dto.getCard().getCardNumber()));
@@ -69,6 +83,6 @@ public class PaymentUserCase {
             payment.get().setDateTimeCancel(null);
         }
 
-        return Optional.ofNullable(paymentGateway.insert(payment.orElse(null)));
+        return paymentGateway.update(payment.orElse(null));
     }
 }

@@ -1,19 +1,37 @@
 package com.spring.payment.usercase;
 
 import com.spring.payment.entities.Card;
+import com.spring.payment.interfaceadapters.gateways.CardGateway;
+import com.spring.payment.interfaceadapters.presenters.converters.CardPresenter;
 import com.spring.payment.interfaceadapters.presenters.dto.CardDto;
+import com.spring.payment.util.exception.BusinessException;
+import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Component
 public class CardUserCase {
     @Autowired
     private Clock clock;
 
-    public Card createCard(CardDto dto) {
+    @Resource
+    private CardGateway gateway;
+
+    @Resource
+    private CardPresenter presenter;
+
+    public CardDto createCard(CardDto dto) throws BusinessException {
+        Card card = gateway.findByCardNumber(dto.getCardNumber());
+
+        if(card.getCardNumber().equals(dto.getCardNumber())
+        && card.getUsers().equals(dto.getUsers())){
+            throw new BusinessException("CARD_DUPLICATE");
+        }
+
         Card entity = new Card();
 
         entity.setUsers(dto.getUsers());
@@ -25,6 +43,31 @@ public class CardUserCase {
 
         entity.setDateTimeCreated(LocalDateTime.now(clock));
 
-        return entity;
+        gateway.insert(entity);
+
+        return presenter.mapToDto(entity);
+    }
+
+    public Optional<CardDto> findByCardNumber(String cardNumber) throws BusinessException {
+        Optional<Card> card = Optional.ofNullable(gateway.findByCardNumber(cardNumber));
+
+        if(card.isEmpty()){
+            throw new BusinessException("CARD_NUMBER_NOT_FOUND");
+        }
+
+        return card.map(presenter::mapToDto);
+    }
+
+    public CardDto inactiveCard(String cardNumber) throws BusinessException {
+        Card card = gateway.findByCardNumber(cardNumber);
+
+        if(card == null){
+            throw new BusinessException("CARD_NUMBER_NOT_FOUND");
+        }
+
+        card.setStatus(false);
+        gateway.update(card);
+
+        return presenter.mapToDto(card);
     }
 }

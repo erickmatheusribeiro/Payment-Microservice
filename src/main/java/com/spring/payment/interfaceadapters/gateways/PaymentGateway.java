@@ -24,5 +24,9 @@ public class PaymentGateway {
         return repository.save(payment);
     }
 
+    public Optional<Payment> update(Payment payment){
+        return Optional.of(repository.save(payment));
+    }
+
 
 }

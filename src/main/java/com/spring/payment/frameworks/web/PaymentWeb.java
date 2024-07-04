@@ -3,6 +3,7 @@ package com.spring.payment.frameworks.web;
 import com.spring.payment.interfaceadapters.controllers.PaymentController;
 import com.spring.payment.interfaceadapters.presenters.dto.PaymentDto;
 import com.spring.payment.util.enums.PaymentStatus;
+import com.spring.payment.util.exception.BusinessException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -19,7 +20,7 @@ public class PaymentWeb {
 
     @PostMapping(consumes = "application/json", produces = "application/json")
     @Operation(summary = "Adiciona um novo cartão")
-    public ResponseEntity<PaymentDto> insert(@Valid @RequestBody PaymentDto dto){
+    public ResponseEntity<PaymentDto> insert(@Valid @RequestBody PaymentDto dto) throws BusinessException {
         return ResponseEntity.ok()
                 .body(controller.insert(dto));
     }
