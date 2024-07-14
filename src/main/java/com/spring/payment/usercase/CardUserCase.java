@@ -10,8 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.Clock;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
+
+import static jakarta.xml.bind.DatatypeConverter.parseDate;
 
 @Component
 public class CardUserCase {
@@ -27,8 +31,9 @@ public class CardUserCase {
     public CardDto createCard(CardDto dto) throws BusinessException {
         Card card = gateway.findByCardNumber(dto.getCardNumber());
 
-        if(card.getCardNumber().equals(dto.getCardNumber())
-        && card.getUsers().equals(dto.getUsers())){
+        if(card != null
+                && card.getCardNumber().equals(dto.getCardNumber())
+                && card.getUsers().equals(dto.getUsers())){
             throw new BusinessException("CARD_DUPLICATE");
         }
 

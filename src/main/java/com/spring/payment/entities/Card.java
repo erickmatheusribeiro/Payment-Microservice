@@ -19,25 +19,25 @@ public class Card {
     @Column
     private Integer id;
 
-    @Column(nullable = false)
+    @Column(name = "userid")
     private String users;
 
-    @Column(nullable = false)
+    @Column(name = "status")
     private boolean status;
 
-    @Column(nullable = false)
+    @Column(name = "name")
     private String name;
 
-    @Column(nullable = false)
+    @Column(name ="cardnumber")
     private String cardNumber;
 
-    @Column(nullable = false)
+    @Column(name = "validation")
     private String expirationDate;
 
-    @Column(nullable = false)
+    @Column(name = "cvv")
     private String cvv;
 
-    @Column(nullable = false)
+    @Column(name = "datetimecreation")
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime dateTimeCreated;
 }

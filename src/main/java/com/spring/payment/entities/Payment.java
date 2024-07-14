@@ -22,31 +22,35 @@ public class Payment {
     @Column
     private Integer id;
 
-    @Column(nullable = false)
+    @Column(name = "userid")
     private String users;
 
-    @Column(nullable = false)
+    @Column(name = "orderid")
     private String orders;
 
     @Enumerated(value = EnumType.STRING)
+    @Column(name = "status")
     private PaymentStatus status;
 
-    @Column(precision = 15, scale = 4)
+    @Column(name = "value", precision = 15, scale = 4)
     private BigDecimal value;
 
-    @Column(nullable = false)
+    @Column(name = "datetimecreation")
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime dateTimeCreated;
 
+    @Column(name = "datetimeend")
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime dateTimeEnd;
 
+    @Column(name = "datetimecancel")
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime dateTimeCancel;
 
-    @Column(nullable = false, length = 2)
+    @Column(name = "totalcardinstallment")
     private int totalCardInstallment;
 
     @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "cardid")
     private Card card;
 }
