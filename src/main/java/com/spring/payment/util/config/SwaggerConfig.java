@@ -28,8 +28,8 @@ public class SwaggerConfig {
         return new OpenAPI()
                 .info(
                         new Info()
-                                .title("Sistema de Gerenciamento de Pedidos")
-                                .description("API para Microsserviço de Pedido")
+                                .title("Sistema de pagamentos")
+                                .description("API para Microsserviço de Pagamentos")
                                 .version("1.0.0")
                 ).addServersItem(new Server().url(serverUrl))
                 .addSecurityItem(new SecurityRequirement()
@@ -49,7 +49,7 @@ public class SwaggerConfig {
     public GroupedOpenApi groupedOpenApi() {
         return GroupedOpenApi.builder()
                 .group("Pagamentos")
-                .packagesToScan("com.spring.batch.api.products.frameworks.web")
+                .packagesToScan("com.spring.payment.frameworks.web")
                 .build();
     }
 
