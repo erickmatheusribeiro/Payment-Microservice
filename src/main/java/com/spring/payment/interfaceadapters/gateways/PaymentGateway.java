@@ -2,9 +2,11 @@ package com.spring.payment.interfaceadapters.gateways;
 
 import com.spring.payment.entities.Payment;
 import com.spring.payment.frameworks.db.PaymentRepository;
+import com.spring.payment.util.enums.PaymentStatus;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -28,5 +30,7 @@ public class PaymentGateway {
         return Optional.of(repository.save(payment));
     }
 
-
+    public List<Payment> findByStatus(PaymentStatus status){
+        return repository.findByStatus(status);
+    }
 }

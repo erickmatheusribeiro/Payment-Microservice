@@ -2,6 +2,7 @@ package com.spring.payment.usercase;
 
 import com.spring.payment.entities.Card;
 import com.spring.payment.entities.Payment;
+import com.spring.payment.frameworks.external.cart.CartWeb;
 import com.spring.payment.interfaceadapters.gateways.CardGateway;
 import com.spring.payment.interfaceadapters.gateways.PaymentGateway;
 import com.spring.payment.interfaceadapters.presenters.converters.CardPresenter;
@@ -29,6 +30,9 @@ public class PaymentUserCase {
 
     @Autowired
     private PaymentGateway paymentGateway;
+
+    @Autowired
+    private CartWeb cartWeb;
 
     public Payment createPayment(PaymentDto dto) throws BusinessException{
         Payment entity = new Payment();
@@ -76,8 +80,10 @@ public class PaymentUserCase {
 
         if(PaymentStatus.COMPLETED.equals(status)){
             payment.get().setDateTimeEnd(LocalDateTime.now(clock));
+            cartWeb.confirmOder(payment.get().getOrders());
         } else if(PaymentStatus.CANCELLED.equals(status)){
             payment.get().setDateTimeCancel(LocalDateTime.now(clock));
+            cartWeb.cancelOder(payment.get().getOrders());
         } else if(PaymentStatus.PENDING.equals(status)){
             payment.get().setDateTimeEnd(null);
             payment.get().setDateTimeCancel(null);
